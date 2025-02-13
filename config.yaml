@@ -1,39 +1,35 @@
 cookie:
   expiry_days: 30
-  key: some_signature_key # Must be a string
+  key: some_signature_key
   name: some_cookie_name
 credentials:
   usernames:
+    hungrypanda:
+      name: Hungry Panda
+      email: jsmith@gmail.com
+      password: y@NK5MhRF&7AmdA91GyQ
+      roles:
+      - admin
+      - editor
+      - viewer
     jsmith:
       email: jsmith@gmail.com
-      failed_login_attempts: 0 # Will be managed automatically
+      failed_login_attempts: 0
       first_name: John
       last_name: Smith
-      logged_in: False # Will be managed automatically
-      password: abc # Will be hashed automatically
-      roles: # Optional
+      logged_in: false
+      password: abc
+      roles:
       - admin
       - editor
       - viewer
     rbriggs:
       email: rbriggs@gmail.com
-      failed_login_attempts: 0 # Will be managed automatically
+      failed_login_attempts: 0
       first_name: Rebecca
       last_name: Briggs
-      logged_in: False # Will be managed automatically
-      password: def # Will be hashed automatically
-      roles: # Optional
+      logged_in: false
+      password: def
+      roles:
       - viewer
-oauth2: # Optional
-  google: # Follow instructions: https://developers.google.com/identity/protocols/oauth2
-    client_id: # To be filled
-    client_secret: # To be filled
-    redirect_uri: # URL to redirect to after OAuth2 authentication
-  microsoft: # Follow instructions: https://learn.microsoft.com/en-us/graph/auth-register-app-v2
-    client_id: # To be filled
-    client_secret: # To be filled
-    redirect_uri: # URL to redirect to after OAuth2 authentication
-    tenant_id: # To be filled
-pre-authorized: # Optional
-  emails:
-  - melsby@gmail.com
+

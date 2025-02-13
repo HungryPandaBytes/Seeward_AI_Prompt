@@ -26,10 +26,11 @@ def register_user(username, name, password):
     if username in config['credentials']['usernames']:
         return "Username already exists"
     
-    hashed_password = stauth.generate_hash(password)
     config['credentials']['usernames'][username] = {
         'name': name,
-        'password': hashed_password
+        'password': password,
+        'permission_level': 'viewer',  # Add default permission level, 
+        'email':'random@email.com'
     }
     save_config(config)
     return "Registration successful"
@@ -129,7 +130,7 @@ def main():
             authenticator.login('main')
         except Exception as e:
             st.error(f"An error occurred: {e}")
-            
+
         if st.session_state.get('authentication_status'):
             authenticator.logout('main')
             st.write(f'Welcome *{st.session_state["name"]}*')
