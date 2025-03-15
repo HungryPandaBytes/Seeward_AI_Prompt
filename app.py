@@ -21,7 +21,7 @@ st.set_page_config(layout="wide")  # Makes the app use the full width of the pag
 st.markdown("""
 <style>
     .block-container {
-        padding-top: 0rem;
+        padding-top: 1.1rem;
         padding-bottom: 1rem;
         padding-left: 2rem;
         padding-right: 2rem;
@@ -152,47 +152,68 @@ def main():
         with tab1:
             try: 
                 authenticator.login('main')
-                st.write(f'Welcome *{st.session_state["name"]}*')
 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
 
             if st.session_state.get('authentication_status'):
+                st.write(f'Welcome *{st.session_state["name"]}*')
                 authenticator.logout('Logout')
 
     
+    if st.session_state.get('authentication_status'):
 
 
-    main_tab1, main_tab2 = st.tabs(["AI Insights", "Developer"])
+        main_tab1, main_tab2, main_tab3 = st.tabs(["AI Insights", "CISO", "Developer"])
 
-    with main_tab1:
+        with main_tab1:
 
-        if st.session_state.get('authentication_status'):
-            main_app()
-        elif st.session_state.get('authentication_status') == False:
+            if st.session_state.get('authentication_status'):
+                main_app()
+            
+            
+
+        with main_tab2:
+            # Define the URL of your Looker Studio report
+            report_url = "https://lookerstudio.google.com/reporting/f3ad9ed5-bf70-436f-9793-6dec28a6fe81"
+
+            # Create an iframe to embed the report
+            st.components.v1.html(
+                f"""
+                <iframe
+                    width="100%"
+                    height="700"
+                    src="{report_url}"
+                    frameborder="0"
+                    allowfullscreen
+                ></iframe>
+                """,
+                height=700,
+            )
+
+        with main_tab3:
+            # Define the URL of your Looker Studio report
+            report_url = "https://lookerstudio.google.com/embed/reporting/67160775-9563-45e9-a9e7-a01b3bb00868/page/p_f2mnuhz8pd"
+
+            # Create an iframe to embed the report
+            st.components.v1.html(
+                f"""
+                <iframe
+                    width="100%"
+                    height="700"
+                    src="{report_url}"
+                    frameborder="0"
+                    allowfullscreen
+                ></iframe>
+                """,
+                height=700,
+            )
+
+    elif st.session_state.get('authentication_status') == False:
             st.error('Username/password is incorrect')
-        else:
-            st.warning('Please enter your username and password')
+    else:
+        st.warning('Please enter your username and password')
 
-        
-
-    with main_tab2:
-        # Define the URL of your Looker Studio report
-        report_url = "https://lookerstudio.google.com/embed/reporting/67160775-9563-45e9-a9e7-a01b3bb00868/page/p_f2mnuhz8pd"
-
-        # Create an iframe to embed the report
-        st.components.v1.html(
-            f"""
-            <iframe
-                width="100%"
-                height="700"
-                src="{report_url}"
-                frameborder="0"
-                allowfullscreen
-            ></iframe>
-            """,
-            height=700,
-        )
 
             
 if __name__ == '__main__':
