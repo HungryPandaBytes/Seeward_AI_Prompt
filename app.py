@@ -4,6 +4,11 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader  
 import os
+from dotenv import load_dotenv
+import pandas as pd
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Get OpenAI API key
 api_key = os.getenv("OPENAI_API_KEY")
@@ -35,15 +40,19 @@ def register_user(username, name, password):
     save_config(config)
     return "Registration successful"
 
-def analyze_text(text):
+def analyze_security_data(csv_data, question):
     if not api_key:
         st.error("OpenAI API key is not set. Please set it in your environment variables.")
         return
     
     model = "gpt-3.5-turbo"
+    
+    # Create a summary of the CSV data to include in the prompt
+    data_summary = csv_data.head(10).to_string()
+    
     messages = [
-        {"role": "system", "content": "You are an assistant who helps craft social media posts."},
-        {"role": "user", "content": f"Please help me write a social media post based on the following:\n{text}"}
+        {"role": "system", "content": "You are a cybersecurity expert who analyzes scanner data and provides insights."},
+        {"role": "user", "content": f"Here's some scanner data (first 10 rows as sample):\n\n{data_summary}\n\nThe complete dataset has {len(csv_data)} rows and columns: {', '.join(csv_data.columns.tolist())}.\n\nBased on this data, please provide insights on: {question}. Can you explain how you came up with recommended insights?"}
     ]
 
     response = client.chat.completions.create(
@@ -53,38 +62,35 @@ def analyze_text(text):
     )
     return response.choices[0].message.content
 
-def generate_image(text):
-    if not api_key:
-        st.error("OpenAI API key is not set. Please set it in your environment variables.")
-        return
-
-    response = client.images.generate(
-        model="dall-e-3",
-        prompt=text,
-        size="1024x1024",
-        quality="standard",
-        n=1,
-    )
-    return response.data[0].url
 
 def main_app():
-    st.title('🤖 AI Content Assistant')
-    st.markdown('I was made to help you craft interesting Social media posts.')
+    st.title("🔒 Cybersecurity Insights Assistant")
+
+    st.markdown('Upload scanner data to get cybersecurity insights.')
     
-    user_input = st.text_area("Enter a brief for your post:", "Panda eating a big fake cake")
-
-    if st.button('Generate Post Content'):
-        with st.spinner('Generating Text...'):
-            post_text = analyze_text(user_input)
-            st.write(post_text)
-
-        with st.spinner('Generating Thumbnail...'):
-            thumbnail_url = generate_image(user_input)
-            st.image(thumbnail_url, caption='Generated Thumbnail')
+    uploaded_file = st.file_uploader("Upload your scanner data CSV file", type="csv")
+    
+    if uploaded_file is not None:
+        # Read the CSV file into a pandas DataFrame
+        csv_data = pd.read_csv(uploaded_file)
+        
+        # Display a sample of the data
+        st.subheader("Data Preview")
+        st.dataframe(csv_data.head())
+        
+        # Allow user to ask specific questions about the data
+        question = st.text_area("What insights would you like to get from this data?", 
+                               "Identify the top 5 critical vulnerabilities from this scan data that pose the highest risk, and provide specific mitigation steps.")
+        
+        if st.button('Generate Insights'):
+            with st.spinner('Analyzing data...'):
+                insights = analyze_security_data(csv_data, question)
+                
+                st.subheader("Security Insights")
+                st.write(insights)
 
 
 def main():
-    st.title("My Application")
     
     # Create default config if it doesn't exist
     try:
@@ -110,29 +116,40 @@ def main():
         cookie_expiry_days=config['cookie']['expiry_days']
     )
 
-    # Login/Register tabs
-    tab1, tab2 = st.tabs(["Login", "Register"])
     
-    with tab2:
-        st.header("Register")
-        with st.form("register_form"):
-            reg_username = st.text_input("Username")
-            reg_name = st.text_input("Name")
-            reg_password = st.text_input("Password", type="password")
-            register_button = st.form_submit_button("Register")
-            
-            if register_button:
-                result = register_user(reg_username, reg_name, reg_password)
-                st.write(result)
+    with st.sidebar:
+        
+        # Login/Register tabs
+        tab1, tab2 = st.tabs(["Login", "Register"])
+        
+        with tab2:
+            st.header("Register")
+            with st.form("register_form"):
+                reg_username = st.text_input("Username")
+                reg_name = st.text_input("Name")
+                reg_password = st.text_input("Password", type="password")
+                register_button = st.form_submit_button("Register")
+                
+                if register_button:
+                    result = register_user(reg_username, reg_name, reg_password)
+                    st.write(result)
 
-    with tab1:
-        try: 
-            authenticator.login('main')
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+        with tab1:
+            try: 
+                authenticator.login('main')
+
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
+
+            if st.session_state.get('authentication_status'):
+                authenticator.logout('Logout')
+
+    
+    main_tab1, main_tab2 = st.tabs(["AI Insights", "Developer Dashboard"])
+
+    with main_tab1:
 
         if st.session_state.get('authentication_status'):
-            authenticator.logout('main')
             st.write(f'Welcome *{st.session_state["name"]}*')
             main_app()
         elif st.session_state.get('authentication_status') == False:
@@ -140,5 +157,8 @@ def main():
         else:
             st.warning('Please enter your username and password')
 
+        
+
+            
 if __name__ == '__main__':
     main()
