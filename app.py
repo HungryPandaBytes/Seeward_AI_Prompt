@@ -14,6 +14,21 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
+# Set the page width
+st.set_page_config(layout="wide")  # Makes the app use the full width of the page
+
+# Custom CSS to modify padding
+st.markdown("""
+<style>
+    .block-container {
+        padding-top: 0rem;
+        padding-bottom: 1rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 def load_config():
     with open('config.yaml') as file:
         config = yaml.load(file, Loader=SafeLoader)
@@ -118,7 +133,7 @@ def main():
 
     
     with st.sidebar:
-        
+
         # Login/Register tabs
         tab1, tab2 = st.tabs(["Login", "Register"])
         
@@ -137,6 +152,7 @@ def main():
         with tab1:
             try: 
                 authenticator.login('main')
+                st.write(f'Welcome *{st.session_state["name"]}*')
 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
@@ -145,12 +161,13 @@ def main():
                 authenticator.logout('Logout')
 
     
-    main_tab1, main_tab2 = st.tabs(["AI Insights", "Developer Dashboard"])
+
+
+    main_tab1, main_tab2 = st.tabs(["AI Insights", "Developer"])
 
     with main_tab1:
 
         if st.session_state.get('authentication_status'):
-            st.write(f'Welcome *{st.session_state["name"]}*')
             main_app()
         elif st.session_state.get('authentication_status') == False:
             st.error('Username/password is incorrect')
@@ -158,6 +175,24 @@ def main():
             st.warning('Please enter your username and password')
 
         
+
+    with main_tab2:
+        # Define the URL of your Looker Studio report
+        report_url = "https://lookerstudio.google.com/embed/reporting/67160775-9563-45e9-a9e7-a01b3bb00868/page/p_f2mnuhz8pd"
+
+        # Create an iframe to embed the report
+        st.components.v1.html(
+            f"""
+            <iframe
+                width="100%"
+                height="700"
+                src="{report_url}"
+                frameborder="0"
+                allowfullscreen
+            ></iframe>
+            """,
+            height=700,
+        )
 
             
 if __name__ == '__main__':
