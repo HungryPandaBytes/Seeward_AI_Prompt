@@ -160,7 +160,9 @@ def main():
                 st.write(f'Welcome *{st.session_state["name"]}*')
                 authenticator.logout('Logout')
 
-    
+    st.logo("./images/seeward_logo.png", size="medium", link=None, icon_image=None)
+
+
     if st.session_state.get('authentication_status'):
 
 
