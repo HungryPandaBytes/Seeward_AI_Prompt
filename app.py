@@ -166,7 +166,7 @@ def main():
     if st.session_state.get('authentication_status'):
 
 
-        main_tab1, main_tab2, main_tab3 = st.tabs(["AI Insights", "CISO", "Developer"])
+        main_tab1, main_tab2, main_tab3, main_tab4,  = st.tabs(["AI Insights", "CISO", "Security Analyst", "Developer"])
 
         with main_tab1:
 
@@ -195,7 +195,7 @@ def main():
 
         with main_tab3:
             # Define the URL of your Looker Studio report
-            report_url = "https://lookerstudio.google.com/embed/reporting/67160775-9563-45e9-a9e7-a01b3bb00868/page/p_f2mnuhz8pd"
+            report_url = "https://lookerstudio.google.com/embed/reporting/81163f8e-399f-4ce5-bdc4-88acf765cb7d/page/Zn4BF"
 
             # Create an iframe to embed the report
             st.components.v1.html(
@@ -203,6 +203,24 @@ def main():
                 <iframe
                     width="100%"
                     height="700"
+                    src="{report_url}"
+                    frameborder="0"
+                    allowfullscreen
+                ></iframe>
+                """,
+                height=700,
+            )
+
+        with main_tab4:
+            # Define the URL of your Looker Studio report
+            report_url = "https://lookerstudio.google.com/embed/reporting/67160775-9563-45e9-a9e7-a01b3bb00868/page/p_f2mnuhz8pd"
+
+            # Create an iframe to embed the report
+            st.components.v1.html(
+                f"""
+                <iframe
+                    width="100%"
+                    height="1000"
                     src="{report_url}"
                     frameborder="0"
                     allowfullscreen
