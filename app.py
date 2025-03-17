@@ -55,19 +55,35 @@ def register_user(username, name, password):
     save_config(config)
     return "Registration successful"
 
-def analyze_security_data(csv_data, question):
+def analyze_security_data(csv_data, question, focus_on_critical=True):
     if not api_key:
         st.error("OpenAI API key is not set. Please set it in your environment variables.")
         return
     
     model = "gpt-3.5-turbo"
     
-    # Create a summary of the CSV data to include in the prompt
-    data_summary = csv_data.head(10).to_string()
+    # Apply 80/20 principle - focus on high-risk vulnerabilities if requested
+    if focus_on_critical and 'cvss3_score' in csv_data.columns:
+        # Sort by CVSS score (descending) and focus on high scores (typically 7.0+)
+        high_risk = csv_data[csv_data['cvss3_score'] >= 7.0].sort_values(by='cvss3_score', ascending=False)
+        
+        # If we have high risk vulnerabilities, prioritize them
+        if not high_risk.empty:
+            data_summary = high_risk.head(15).to_string()
+            total_vulns = len(csv_data)
+            high_risk_count = len(high_risk)
+            
+            priority_note = f"Focusing on {high_risk_count} critical vulnerabilities (out of {total_vulns} total). These represent approximately {round(high_risk_count/total_vulns*100)}% of vulnerabilities but likely account for 80% of your security risk."
+        else:
+            data_summary = csv_data.head(10).to_string()
+            priority_note = "No high-risk vulnerabilities (CVSS ≥ 7.0) found."
+    else:
+        data_summary = csv_data.head(10).to_string()
+        priority_note = ""
     
     messages = [
-        {"role": "system", "content": "You are a cybersecurity expert who analyzes scanner data and provides insights."},
-        {"role": "user", "content": f"Here's some scanner data (first 10 rows as sample):\n\n{data_summary}\n\nThe complete dataset has {len(csv_data)} rows and columns: {', '.join(csv_data.columns.tolist())}.\n\nBased on this data, please provide insights on: {question}. Can you explain how you came up with recommended insights?"}
+        {"role": "system", "content": "You are a cybersecurity expert who analyzes scanner data and provides actionable insights using the 80/20 principle - focusing on the critical few issues that will provide the greatest security improvement."},
+        {"role": "user", "content": f"Here's vulnerability scanner data (sample rows):\n\n{data_summary}\n\n{priority_note}\n\nThe complete dataset has {len(csv_data)} rows and columns: {', '.join(csv_data.columns.tolist())}.\n\nBased on this data, please provide insights on: {question}\n\nFormat your response with:\n1. Executive Summary (2-3 sentences)\n2. Key Findings (bullet points)\n3. Actionable Recommendations (prioritized list)\n4. Metrics/KPIs to track"}
     ]
 
     response = client.chat.completions.create(
@@ -77,33 +93,58 @@ def analyze_security_data(csv_data, question):
     )
     return response.choices[0].message.content
 
-
 def main_app():
     st.title("🔒 Cybersecurity Insights Assistant")
 
     st.markdown('Upload scanner data to get cybersecurity insights.')
     
-    uploaded_file = st.file_uploader("Upload your scanner data CSV file", type="csv")
+    # Add tabs for different analysis approaches
+    analysis_tab1, analysis_tab2 = st.tabs(["Quick Analysis", "Custom Analysis"])
     
-    if uploaded_file is not None:
-        # Read the CSV file into a pandas DataFrame
-        csv_data = pd.read_csv(uploaded_file)
+    with analysis_tab1:
+        uploaded_file = st.file_uploader("Upload your scanner data CSV file", type="csv", key="quick_upload")
         
-        # Display a sample of the data
-        st.subheader("Data Preview")
-        st.dataframe(csv_data.head())
+        if uploaded_file is not None:
+            # Read the CSV file into a pandas DataFrame
+            csv_data = pd.read_csv(uploaded_file)
+            
+            # Display a sample of the data
+            st.subheader("Data Preview")
+            st.dataframe(csv_data.head())
+            
+            # Quick 80/20 analysis option
+            if st.button('Generate 80/20 Security Insights'):
+                with st.spinner('Analyzing most critical vulnerabilities...'):
+                    # Default question focusing on 80/20 principle
+                    question = "Using the 80/20 principle, identify the most critical vulnerabilities that should be addressed first to maximize security improvement with minimal effort."
+                    insights = analyze_security_data(csv_data, question, focus_on_critical=True)
+                    
+                    st.subheader("Security Insights (80/20 Analysis)")
+                    st.write(insights)
+    
+    with analysis_tab2:
+        uploaded_file = st.file_uploader("Upload your scanner data CSV file", type="csv", key="custom_upload")
         
-        # Allow user to ask specific questions about the data
-        question = st.text_area("What insights would you like to get from this data?", 
-                               "Identify the top 5 critical vulnerabilities from this scan data that pose the highest risk, and provide specific mitigation steps.")
-        
-        if st.button('Generate Insights'):
-            with st.spinner('Analyzing data...'):
-                insights = analyze_security_data(csv_data, question)
-                
-                st.subheader("Security Insights")
-                st.write(insights)
-
+        if uploaded_file is not None:
+            # Read the CSV file into a pandas DataFrame
+            csv_data = pd.read_csv(uploaded_file)
+            
+            # Display a sample of the data
+            st.subheader("Data Preview")
+            st.dataframe(csv_data.head())
+            
+            # Allow user to ask specific questions about the data
+            question = st.text_area("What insights would you like to get from this data?", 
+                                "Identify the top 5 critical vulnerabilities from this scan data that pose the highest risk, and provide specific mitigation steps.")
+            
+            focus_critical = st.checkbox("Focus on critical vulnerabilities (80/20 principle)", value=True)
+            
+            if st.button('Generate Custom Insights'):
+                with st.spinner('Analyzing data...'):
+                    insights = analyze_security_data(csv_data, question, focus_on_critical=focus_critical)
+                    
+                    st.subheader("Security Insights")
+                    st.write(insights)
 
 def main():
     
