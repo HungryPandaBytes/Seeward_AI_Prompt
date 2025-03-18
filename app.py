@@ -1,3 +1,4 @@
+import datetime
 import streamlit as st
 from openai import OpenAI
 import streamlit_authenticator as stauth
@@ -207,7 +208,7 @@ def main():
     if st.session_state.get('authentication_status'):
 
 
-        main_tab1, main_tab2, main_tab3, main_tab4,  = st.tabs(["AI Insights", "CISO", "Security Analyst", "Developer"])
+        main_tab1, main_tab2, main_tab3, main_tab4, main_tab5= st.tabs(["AI Insights", "CISO", "IT Manager", "Security Analyst", "Developer"])
 
         with main_tab1:
 
@@ -217,8 +218,14 @@ def main():
             
 
         with main_tab2:
+
+            # Create a unique key that changes each time this tab is selected
+            # This forces the iframe to reload
+            st.empty()
+            st.button("Refresh Report", key="refresh_report_tab2")
+
             # Define the URL of your Looker Studio report
-            report_url = "https://lookerstudio.google.com/reporting/f3ad9ed5-bf70-436f-9793-6dec28a6fe81"
+            report_url = f"https://lookerstudio.google.com/reporting/f3ad9ed5-bf70-436f-9793-6dec28a6fe81?refresh={datetime.datetime.now().timestamp()}"
 
             # Create an iframe to embed the report
             st.components.v1.html(
@@ -235,8 +242,38 @@ def main():
             )
 
         with main_tab3:
+
+            # Create a unique key that changes each time this tab is selected
+            # This forces the iframe to reload
+            st.empty()
+            st.button("Refresh Report", key="refresh_report_tab3")
+
             # Define the URL of your Looker Studio report
-            report_url = "https://lookerstudio.google.com/embed/reporting/81163f8e-399f-4ce5-bdc4-88acf765cb7d/page/Zn4BF"
+            report_url = f"https://lookerstudio.google.com/reporting/f3ad9ed5-bf70-436f-9793-6dec28a6fe81?refresh={datetime.datetime.now().timestamp()}"
+
+            # Create an iframe to embed the report
+            st.components.v1.html(
+                f"""
+                <iframe
+                    width="100%"
+                    height="700"
+                    src="{report_url}"
+                    frameborder="0"
+                    allowfullscreen
+                ></iframe>
+                """,
+                height=700,
+            )
+     
+
+        with main_tab4:
+
+            # Create a unique key that changes each time this tab is selected
+            # This forces the iframe to reload
+            st.button("Refresh Report", key="refresh_report_tab4")
+
+            # Define the URL of your Looker Studio report
+            report_url = f"https://lookerstudio.google.com/embed/reporting/81163f8e-399f-4ce5-bdc4-88acf765cb7d/page/Zn4BF?refresh={datetime.datetime.now().timestamp()}"
 
             # Create an iframe to embed the report
             st.components.v1.html(
@@ -252,9 +289,12 @@ def main():
                 height=700,
             )
 
-        with main_tab4:
+        with main_tab5:
+            st.empty()
+            st.button("Refresh Report", key="refresh_report_tab5")
+            
             # Define the URL of your Looker Studio report
-            report_url = "https://lookerstudio.google.com/embed/reporting/67160775-9563-45e9-a9e7-a01b3bb00868/page/p_f2mnuhz8pd"
+            report_url = f"https://lookerstudio.google.com/embed/reporting/67160775-9563-45e9-a9e7-a01b3bb00868/page/p_f2mnuhz8pd?refresh={datetime.datetime.now().timestamp()}"
 
             # Create an iframe to embed the report
             st.components.v1.html(
