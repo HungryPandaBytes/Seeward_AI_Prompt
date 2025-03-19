@@ -207,8 +207,9 @@ def main():
 
     if st.session_state.get('authentication_status'):
 
+        main_tab1, main_tab2, main_tab4, main_tab5= st.tabs(["AI Insights", "CISO", "Security Analyst", "Developer"])
 
-        main_tab1, main_tab2, main_tab3, main_tab4, main_tab5= st.tabs(["AI Insights", "CISO", "IT Manager", "Security Analyst", "Developer"])
+        # main_tab1, main_tab2, main_tab3, main_tab4, main_tab5= st.tabs(["AI Insights", "CISO", "IT Manager", "Security Analyst", "Developer"])
 
         with main_tab1:
 
@@ -241,29 +242,29 @@ def main():
                 height=700,
             )
 
-        with main_tab3:
+        # with main_tab3:
 
-            # Create a unique key that changes each time this tab is selected
-            # This forces the iframe to reload
-            st.empty()
-            st.button("Refresh Report", key="refresh_report_tab3")
+        #     # Create a unique key that changes each time this tab is selected
+        #     # This forces the iframe to reload
+        #     st.empty()
+        #     st.button("Refresh Report", key="refresh_report_tab3")
 
-            # Define the URL of your Looker Studio report
-            report_url = f"https://lookerstudio.google.com/reporting/f3ad9ed5-bf70-436f-9793-6dec28a6fe81?refresh={datetime.datetime.now().timestamp()}"
+        #     # Define the URL of your Looker Studio report
+        #     report_url = f"https://lookerstudio.google.com/reporting/f3ad9ed5-bf70-436f-9793-6dec28a6fe81?refresh={datetime.datetime.now().timestamp()}"
 
-            # Create an iframe to embed the report
-            st.components.v1.html(
-                f"""
-                <iframe
-                    width="100%"
-                    height="700"
-                    src="{report_url}"
-                    frameborder="0"
-                    allowfullscreen
-                ></iframe>
-                """,
-                height=700,
-            )
+        #     # Create an iframe to embed the report
+        #     st.components.v1.html(
+        #         f"""
+        #         <iframe
+        #             width="100%"
+        #             height="700"
+        #             src="{report_url}"
+        #             frameborder="0"
+        #             allowfullscreen
+        #         ></iframe>
+        #         """,
+        #         height=700,
+        #     )
      
 
         with main_tab4:
