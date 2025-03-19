@@ -225,7 +225,7 @@ def main():
             st.button("Refresh Report", key="refresh_report_tab2")
 
             # Define the URL of your Looker Studio report
-            report_url = f"https://lookerstudio.google.com/reporting/f3ad9ed5-bf70-436f-9793-6dec28a6fe81?refresh={datetime.datetime.now().timestamp()}"
+            report_url = f"https://lookerstudio.google.com/embed/reporting/f3ad9ed5-bf70-436f-9793-6dec28a6fe81/page/XvB6E?refresh={datetime.datetime.now().timestamp()}"
 
             # Create an iframe to embed the report
             st.components.v1.html(
