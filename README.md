@@ -2,7 +2,7 @@
 
 A Streamlit application for analyzing and visualizing cybersecurity vulnerability data with AI-powered insights.
 
-Live Demo: [https://seewardaiprompt-gqw2zhx5ffxhycyvg6f5vw.streamlit.app/]
+[Live Demo](https://seewardaiprompt-gqw2zhx5ffxhycyvg6f5vw.streamlit.app/)
 
 ## Features
 
