@@ -61,7 +61,7 @@ def analyze_security_data(csv_data, question, focus_on_critical=True):
         st.error("OpenAI API key is not set. Please set it in your environment variables.")
         return
     
-    model = "gpt-3.5-turbo"
+    model = "gpt-4"
     
     # Apply 80/20 principle - focus on high-risk vulnerabilities if requested
     if focus_on_critical and 'cvss3_score' in csv_data.columns:
