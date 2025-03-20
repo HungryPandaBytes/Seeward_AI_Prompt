@@ -55,13 +55,6 @@ A Streamlit application for analyzing and visualizing cybersecurity vulnerabilit
 - `images/`: Directory containing application images (including logo)
 - `.env`: Environment variables file (not tracked in git)
 
-## Security Features
-
-- Password-protected access
-- Role-based permissions
-- Focuses on critical vulnerabilities using the 80/20 principle
-- Executive summaries with actionable recommendations
-
 ## Dashboard Integration
 
 The application integrates with Looker Studio for visualization of security metrics with specialized dashboards for different security roles.
